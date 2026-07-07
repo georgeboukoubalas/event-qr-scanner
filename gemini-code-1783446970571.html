@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    #qr-reader { width: 500px; box-sizing: border-box; margin: 0 auto; background: white; }
+    @media only screen and (max-width: 600px) { #qr-reader { width: 100%; } }
+  </style>
+</head>
+<body class="bg-dark text-light">
+  <nav class="navbar sticky-top navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand mx-auto" href="#"><span><i class="bi bi-card-checklist"></i></span> Live Event Scanner</a>
+    </div>
+  </nav>
+  
+  <div class="container mt-4">
+    <!-- Live Scanner Div -->
+    <div id="qr-reader" style="position: relative; padding: 0px; border: none; border-radius: 8px;"></div>
+    <div id="qr-reader-results" class="mt-2 text-center"></div>
+    <br>
+    
+    <form id="InventoryForm">
+      <div class="mb-3 input-group">
+        <span class="input-group-text bg-primary text-white"><i class="bi bi-qr-code-scan"></i></span>
+        <input type="text" class="form-control" id="productCode" name="productCode" placeholder="Scan QR/Bar Code" readonly>
+      </div>
+      <div class="mb-3 input-group">
+        <span class="input-group-text bg-primary text-white"><i class="bi bi-box-fill"></i></span>
+        <input type="text" class="form-control" id="productName" name="product_name" placeholder="Enter product name">
+      </div>
+      <div class="mb-3 input-group">
+        <span class="input-group-text bg-primary text-white"><i class="bi bi-tags-fill"></i></span>
+        <select class="form-select" id="productCategory" name="product_category">
+          <option disabled selected>Choose Category</option>
+          <option value="electronics">Electronics</option>
+          <option value="clothing">Clothing</option>
+          <option value="books">Books</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="mb-3 input-group">
+        <span class="input-group-text bg-primary text-white"><i class="bi bi-123"></i></span>
+        <input type="number" class="form-control" id="quantity" name="quantity" placeholder="Enter quantity">
+      </div>
+      <div class="mb-3 input-group">
+        <span class="input-group-text bg-primary text-white"><i class="bi bi-currency-dollar"></i></span>
+        <input type="number" step="0.01" class="form-control" id="price" name="price" placeholder="Enter price">
+      </div>
+      <button type="submit" class="btn btn-primary mb-3 w-100">Submit Data</button>
+    </form>
+  </div>
+
+  <!-- QR Library and Logic -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxV86FV_jwmd0c15ABbXWgdUVUZEOuCy0yXJnQpxy8l9deNCCVEhbA2YqJGP4rKtd-7/exec"; // <--- PASTE YOUR /exec LINK HERE
+
+    // Initialize Live Scanner
+    document.addEventListener("DOMContentLoaded", function() {
+        var resultContainer = document.getElementById('qr-reader-results');
+        var lastResult, countResults = 0;
+        
+        var html5QrcodeScanner = new Html5QrcodeScanner(
+            "qr-reader", { fps: 10, qrbox: 250 });
+        
+        function onScanSuccess(decodedText, decodedResult) {
+            if (decodedText !== lastResult) {
+                ++countResults;
+                lastResult = decodedText;
+                resultContainer.innerHTML = `<div class="p-2 bg-success text-white rounded">Scanned: ${decodedText}</div>`;
+                document.getElementById("productCode").value = decodedText;
+            }
+        }
+        html5QrcodeScanner.render(onScanSuccess);
+    });
+
+    // Handle Form Submit (Sending data to Apps Script)
+    document.getElementById('InventoryForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = this.querySelector('button[type="submit"]');
+      submitBtn.innerHTML = "Sending...";
+      submitBtn.disabled = true;
+
+      const payload = {
+        productCode: document.getElementById('productCode').value,
+        product_name: document.getElementById('productName').value,
+        product_category: document.getElementById('productCategory').value,
+        quantity: document.getElementById('quantity').value,
+        price: document.getElementById('price').value
+      };
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8', // Plain text avoids CORS preflight errors
+        }
+      })
+      .then(response => {
+        document.getElementById('qr-reader-results').innerHTML = '';
+        document.getElementById('InventoryForm').reset();
+        submitBtn.innerHTML = "Submit Data";
+        submitBtn.disabled = false;
+      })
+      .catch(error => {
+        alert("Error saving data!");
+        submitBtn.innerHTML = "Submit Data";
+        submitBtn.disabled = false;
+      });
+    });
+  </script>
+</body>
+</html>
