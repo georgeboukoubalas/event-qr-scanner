@@ -1,9 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Event Check-in</title>
+  <title>ESN Event Scanner</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
@@ -19,14 +19,26 @@
   </nav>
   
   <div class="container mt-4">
+    <!-- Camera Window -->
     <div id="qr-reader"></div>
     <div id="qr-reader-results" class="mt-3 text-center fs-5 fw-bold"></div>
     
     <form id="CheckinForm" class="mt-4" style="max-width: 500px; margin: 0 auto;">
       
+      <!-- Day Dropdown -->
+      <div class="mb-3 input-group input-group-lg">
+        <span class="input-group-text bg-primary text-white"><i class="bi bi-calendar3"></i></span>
+        <select class="form-select" id="dayData" required>
+          <option value="" disabled selected>Select Event Day...</option>
+          <option value="Day 1">Day 1</option>
+          <option value="Day 2">Day 2</option>
+          <option value="Day 3">Day 3</option>
+        </select>
+      </div>
+
       <!-- Session Dropdown -->
       <div class="mb-3 input-group input-group-lg">
-        <span class="input-group-text bg-primary text-white"><i class="bi bi-calendar-event"></i></span>
+        <span class="input-group-text bg-primary text-white"><i class="bi bi-clock"></i></span>
         <select class="form-select" id="sessionData" required>
           <option value="" disabled selected>Select Session...</option>
           <option value="Morning Welcome">Morning Welcome</option>
@@ -48,7 +60,7 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
     // ⚠️ REPLACE THIS LINK WITH YOUR APPS SCRIPT /exec URL ⚠️
-    const API_URL = "https://script.google.com/macros/s/AKfycbzCl2zDWSB3Fh5ElhfFoB0iCFxrY6oITYiZChsOUD2O2GK5PpbAIq5QtjHkNTH2H5hX/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbz3c-H29VpVEAyF7goPLhKOZSlChXNQ4MeC_C3ChSqAsMJLNuBkrmAsh2FbFzxfVjPJ/exec"; 
     
     let lastResult = ""; 
 
@@ -87,6 +99,7 @@
           submitBtn.disabled = true;
 
           const payload = {
+            day: document.getElementById('dayData').value,
             session: document.getElementById('sessionData').value,
             qr_data: attendeeInput.value
           };
@@ -98,11 +111,22 @@
           })
           .then(response => response.json())
           .then(data => {
-            resultContainer.innerHTML = `<span class="text-info">Scan #${data.order} Saved. Ready for next.</span>`;
+            if(data.status === "error") {
+                alert("Server Error: " + data.message);
+                submitBtn.innerHTML = "Check In Attendee";
+                submitBtn.disabled = false;
+                return;
+            }
+
+            resultContainer.innerHTML = `<span class="text-info">Scan #${data.order} Saved to ${payload.day}. Ready for next.</span>`;
             
-            // Keep the selected session
+            // Keep the selected Day and Session
+            const currentDay = document.getElementById('dayData').value;
             const currentSession = document.getElementById('sessionData').value;
+            
             document.getElementById('CheckinForm').reset();
+            
+            document.getElementById('dayData').value = currentDay;
             document.getElementById('sessionData').value = currentSession;
             
             submitBtn.innerHTML = "Check In Attendee";
@@ -110,7 +134,7 @@
           })
           .catch(error => {
             console.error("Fetch error:", error);
-            alert("Error connecting to Google Sheets! Check the console for details.");
+            alert("Error connecting to Google Sheets! Check your connection.");
             submitBtn.innerHTML = "Check In Attendee";
             submitBtn.disabled = false;
           });
