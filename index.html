@@ -38,9 +38,14 @@
         <span class="input-group-text bg-primary text-white"><i class="bi bi-clock"></i></span>
         <select class="form-select" id="sessionData" required>
           <option value="" disabled selected>Select Scan Phase...</option>
-          <option value="1st scan">1st scan (Lines 2-70)</option>
-          <option value="2nd scan">2nd scan (Lines 80-150)</option>
-          <option value="3rd scan">3rd scan (Lines 160-240)</option>
+          <option value="1st Check in">1st Check in (Lines 2-100)</option>
+          <option value="1st Check out">1st Check out (Lines 110-210)</option>
+          <option value="2nd Check in">2nd Check in (Lines 220-320)</option>
+          <option value="2nd Check out">2nd Check out (Lines 330-430)</option>
+          <option value="3rd Check in">3rd Check in (Lines 440-540)</option>
+          <option value="3rd Check out">3rd Check out (Lines 550-650)</option>
+          <option value="4th Check in">4th Check in (Lines 660-760)</option>
+          <option value="4th Check out">4th Check out (Lines 770-870)</option>
         </select>
       </div>
 
@@ -56,7 +61,7 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
     // ⚠️ REPLACE WITH YOUR NEW URL ⚠️
-    const API_URL = "https://script.google.com/macros/s/AKfycby5t-6XedRhPfIS9B8ln8PNwaxq_MhkLUVjfC2B8pvvXM855zGueT0MaR_xcmHhl5W-/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbwRfF6Gfl606zhRe5x67cd1HY_pU76Cxz_6Se7JA5rJsDEkQ_InkBkZV0W-TEtQ2ilW/exec"; 
     
     let lastResult = ""; 
 
@@ -91,7 +96,6 @@
             qr_data: attendeeInput.value
           };
 
-          // THE FIX: Grabbing raw text first to catch Google's HTML login/error pages
           fetch(API_URL, {
             method: 'POST',
             body: JSON.stringify(payload),
@@ -104,7 +108,6 @@
                 data = JSON.parse(rawText);
             } catch (err) {
                 alert("Google Blocked Connection: Make sure deployment is set to 'Anyone' and Authorized.");
-                console.error("RAW HTML FROM GOOGLE:", rawText);
                 submitBtn.innerHTML = "Check In Attendee";
                 submitBtn.disabled = false;
                 lastResult = "";
