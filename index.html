@@ -25,25 +25,26 @@
     
     <form id="CheckinForm" class="mt-4" style="max-width: 500px; margin: 0 auto;">
       
-      <!-- Day Dropdown -->
+      <!-- Day / Target Sheet Dropdown -->
       <div class="mb-3 input-group input-group-lg">
         <span class="input-group-text bg-primary text-white"><i class="bi bi-calendar3"></i></span>
         <select class="form-select" id="dayData" required>
-          <option value="" disabled selected>Select Event Day...</option>
+          <option value="" disabled selected>Select Sheet...</option>
           <option value="Day 1">Day 1</option>
           <option value="Day 2">Day 2</option>
           <option value="Day 3">Day 3</option>
+          <option value="lefts">lefts (Exits)</option>
         </select>
       </div>
 
-      <!-- Session Dropdown -->
+      <!-- Segment / Session Dropdown -->
       <div class="mb-3 input-group input-group-lg">
         <span class="input-group-text bg-primary text-white"><i class="bi bi-clock"></i></span>
         <select class="form-select" id="sessionData" required>
-          <option value="" disabled selected>Select Session...</option>
-          <option value="Morning Welcome">Morning Welcome</option>
-          <option value="Main Workshop">Main Workshop</option>
-          <option value="Afterparty">Afterparty</option>
+          <option value="" disabled selected>Select Scan Phase...</option>
+          <option value="1st scan">1st scan (Lines 2-70)</option>
+          <option value="2nd scan">2nd scan (Lines 80-150)</option>
+          <option value="3rd scan">3rd scan (Lines 160-240)</option>
         </select>
       </div>
 
@@ -60,7 +61,7 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
     // ⚠️ REPLACE THIS LINK WITH YOUR APPS SCRIPT /exec URL ⚠️
-    const API_URL = "https://script.google.com/macros/s/AKfycbwZEvIi--TBYKnVw0uPP1W8dB2xcjRWPKCLmJc1-BXkMqQFqPYGR0g9uU59EKCFK0oP/exec"; 
+    const API_URL = "https://script.google.com/a/macros/wm.esngreece.gr/s/AKfycby4N-R0tcIy_L7Csad6es1VtZgBRepavVoQM8oMHEElPERq5-qR7qBaEUg8ZiLN41pa/exec"; 
     
     let lastResult = ""; 
 
@@ -69,7 +70,6 @@
         const attendeeInput = document.getElementById("attendeeData");
         const submitBtn = document.getElementById("submitBtn");
         
-        // Initialize the scanner
         const html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250 });
         
         function onScanSuccess(decodedText) {
@@ -86,7 +86,6 @@
         
         html5QrcodeScanner.render(onScanSuccess);
 
-        // Handle the Form Submit
         document.getElementById('CheckinForm').addEventListener('submit', function(e) {
           e.preventDefault();
           
@@ -111,16 +110,18 @@
           })
           .then(response => response.json())
           .then(data => {
+            // Check for our custom capacity error
             if(data.status === "error") {
-                alert("Server Error: " + data.message);
+                alert(data.message); // This will pop up the "SECTION IS FULL" error
                 submitBtn.innerHTML = "Check In Attendee";
                 submitBtn.disabled = false;
+                lastResult = ""; // Unlock scanner so they can try again if they change sessions
                 return;
             }
 
-            resultContainer.innerHTML = `<span class="text-info">Scan #${data.order} Saved to ${payload.day}. Ready for next.</span>`;
+            // Notice: The success message now tells the volunteer exactly which row it saved to!
+            resultContainer.innerHTML = `<span class="text-info">Scan #${data.order} Saved to Line ${data.row}. Ready for next.</span>`;
             
-            // Keep the selected Day and Session
             const currentDay = document.getElementById('dayData').value;
             const currentSession = document.getElementById('sessionData').value;
             
