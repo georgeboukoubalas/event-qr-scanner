@@ -1,0 +1,53 @@
+<!--
+  This code uses the html5-qrcode library from GitHub: https://github.com/mebjas/html5-qrcode
+  Example Link: https://gist.github.com/mebjas/729c5397506a879ec704075c8a5284e8
+ -->
+
+<!--
+  Using the core html5-qrcode library for static image scanning
+ -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
+
+<script>
+  function docReady(fn) {
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+        setTimeout(fn, 1);
+    } else {
+        document.addEventListener("DOMContentLoaded", fn);
+    }
+  } 
+
+  docReady(function() {
+      const fileInput = document.getElementById('qr-input-file');
+      const resultContainer = document.getElementById('qr-reader-results');
+      const productCodeInput = document.getElementById("productCode");
+      
+      // Initialize the core library targeting the hidden div
+      const html5QrCode = new Html5Qrcode("qr-reader-hidden");
+
+      // Listen for when the user snaps a photo
+      fileInput.addEventListener('change', e => {
+          if (e.target.files.length == 0) {
+              return; // User canceled the camera
+          }
+          
+          const imageFile = e.target.files[0];
+          
+          // Show a scanning message
+          resultContainer.innerHTML = `<div class="p-3 mb-2 bg-info text-white">Scanning photo...</div>`;
+          
+          // Scan the image file
+          html5QrCode.scanFile(imageFile, true)
+          .then(decodedText => {
+              // Success: Fill the form and show a success message
+              resultContainer.innerHTML = `<div class="p-3 mb-2 bg-success text-white">Success! Code: ${decodedText}</div>`;
+              productCodeInput.value = decodedText;
+          })
+          .catch(err => {
+              // Failure: Couldn't read a QR code
+              resultContainer.innerHTML = `<div class="p-3 mb-2 bg-danger text-white">No QR code found. Try taking another photo with better lighting.</div>`;
+              productCodeInput.value = "";
+          });
+      });
+  });
+</script>
