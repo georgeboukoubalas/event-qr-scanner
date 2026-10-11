@@ -1,0 +1,43 @@
+<div class="mt-4 mb-3">
+  <label class="form-label fw-bold">Take a Photo of the QR Code</label>
+  <input type="file" id="qr-input-file" class="form-control form-control-lg bg-primary text-white" accept="image/*" capture="environment">
+</div>
+
+<div id="qr-reader-results"></div>
+
+<!-- The library still requires a div ID to initialize, even if it's hidden -->
+<div id="qr-reader-hidden" style="display: none;"></div>
+
+<br>
+
+<form id="InventoryForm" onsubmit="handleFormSubmit(this)">
+  <div class="mb-3 input-group">
+    <span class="input-group-text bg-primary text-white"><i class="bi bi-qr-code-scan"></i></span>
+    <input type="text" class="form-control" id="productCode" name="productCode" placeholder="Scan QR/Bar Code" readonly>
+  </div>
+
+  <div class="mb-3 input-group">
+    <span class="input-group-text bg-primary text-white"><i class="bi bi-box-fill"></i></span>
+    <input type="text" class="form-control" id="productName" name="product_name" placeholder="Enter product name">
+  </div>
+  <div class="mb-3 input-group">
+    <!-- <label for="productCategory" class="form-label">Product Category:</label> -->
+    <span class="input-group-text bg-primary text-white"><i class="bi bi-tags-fill"></i></span>
+    <select class="form-select" id="productCategory" name="product_category">
+          <option disabled selected>Choose Category</option>
+          <option value="electronics">Electronics</option>
+          <option value="clothing">Clothing</option>
+          <option value="books">Books</option>
+          <option value="other">Other</option>
+        </select>
+  </div>
+  <div class="mb-3 input-group">
+    <span class="input-group-text bg-primary text-white"><i class="bi bi-123"></i></span>
+    <input type="number" class="form-control" id="quantity" name="quantity" placeholder="Enter quantity">
+  </div>
+  <div class="mb-3 input-group">
+    <span class="input-group-text bg-primary text-white"><i class="bi bi-currency-dollar"></i></span>
+    <input type="number" step="0.01" class="form-control" id="price" name="price" placeholder="Enter price">
+  </div>
+  <button type="submit" class="btn btn-primary mb-3 w-100">Submit</button>
+</form>
