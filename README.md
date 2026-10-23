@@ -45,7 +45,7 @@ Follow these steps to deploy this scanner for your own event.
 1. Create a new Google Sheet. This will be your `Attendance_sheet_DB`.
 2. Set up your columns (e.g., `Name`, `Ticket_ID`, `Status`, `Check-in Time`).
 3. In the Google Sheets menu, click on **Extensions > Apps Script**.
-4. Delete the default code and paste the backend scripts provided in this repository (Code.gs, IndexDB.html, JavaScript.html, CSS.html, QrReaderJS.html, Form.html).
+4. Delete the default code and paste the backend scripts provided in this repository (Code.gs, menu.gs, IndexDB.html, JavaScript.html, CSS.html, QrReaderJS.html, Form.html).
 5. Save the project.
 
 ### Step 2: Deploy the Apps Script as a Web App
