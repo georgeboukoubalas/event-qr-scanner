@@ -1,3 +1,15 @@
+// --- UPDATED CAPACITY: ~100 rows per block to safely fit 95 people ---
+const SESSION_RANGES = {
+  "1st Check in":  { start: 2,   end: 100 },
+  "1st Check out": { start: 110, end: 210 },
+  "2nd Check in":  { start: 220, end: 320 },
+  "2nd Check out": { start: 330, end: 430 },
+  "3rd Check in":  { start: 440, end: 540 },
+  "3rd Check out": { start: 550, end: 650 },
+  "4th Check in":  { start: 660, end: 760 },
+  "4th Check out": { start: 770, end: 870 }
+};
+
 function doPost(e) {
   const lock = LockService.getScriptLock();
   
@@ -17,18 +29,6 @@ function doPost(e) {
     if (!dataSheet) {
       return ContentService.createTextOutput(JSON.stringify({ "status": "error", "message": "Sheet '" + targetSheetName + "' not found!" })).setMimeType(ContentService.MimeType.JSON);
     }
-    
-    // --- UPDATED CAPACITY: ~100 rows per block to safely fit 95 people ---
-    const SESSION_RANGES = {
-      "1st Check in":  { start: 2,   end: 100 },
-      "1st Check out": { start: 110, end: 210 },
-      "2nd Check in":  { start: 220, end: 320 },
-      "2nd Check out": { start: 330, end: 430 },
-      "3rd Check in":  { start: 440, end: 540 },
-      "3rd Check out": { start: 550, end: 650 },
-      "4th Check in":  { start: 660, end: 760 },
-      "4th Check out": { start: 770, end: 870 }
-    };
     
     const sheetTimeZone = ss.getSpreadsheetTimeZone();
     const exactTime = Utilities.formatDate(new Date(), sheetTimeZone, "dd/MM/yyyy, HH:mm:ss");
